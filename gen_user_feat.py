@@ -105,6 +105,21 @@ def get_actions(start_date, end_date):
     return actions
 
 
+def get_action_feat(start_date, end_date):
+    dump_path = './cache/action_accumulate_%s_%s.pkl' % (start_date, end_date)
+    if os.path.exists(dump_path):
+        actions = pickle.load(open(dump_path))
+    else:
+        actions = get_actions(start_date, end_date)
+        actions = actions[['user_id', 'sku_id', 'type']]
+        df = pd.get_dummies(actions['type'], prefix='%s-%s-action' % (start_date, start_date))
+        actions = pd.concat([actions, df], axis=1)  # type: pd.DataFrame
+        actions = actions.groupby(['user_id', 'sku_id'], as_index=False).count()
+        del actions['type']
+        pickle.dump(actions, open(dump_path, 'w'))
+    return actions
+
+
 def get_accumulate_action_feat(start_date, end_date):
     dump_path = './cache/action_accumulate_%s_%s.pkl' % (start_date, end_date)
     if os.path.exists(dump_path):
@@ -210,13 +225,19 @@ def make_train_set(train_start_date, train_end_date, test_start_date, test_end_d
         actions = pickle.load(open(dump_path))
     else:
         start_days = "2016-02-01"
-        actions = get_accumulate_action_feat(train_start_date, train_end_date)
         user = get_basic_user_feat()
         product = get_basic_product_feat()
         user_acc = get_accumulate_user_feat(start_days, train_start_date)
         product_acc = get_accumulate_product_feat(start_days, train_start_date)
         comment_acc = get_comments_product_feat(train_start_date, train_end_date)
         labels = get_labels(test_start_date, test_end_date)
+
+        # generate 时间窗口
+        actions = get_accumulate_action_feat(train_start_date, train_end_date)
+
+
+
+
         actions = pd.merge(actions, user, how='left', on='user_id')
         actions = pd.merge(actions, user_acc, how='left', on='user_id')
         actions = pd.merge(actions, product, how='left', on='sku_id')
