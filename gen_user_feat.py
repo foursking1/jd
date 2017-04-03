@@ -233,8 +233,8 @@ def make_train_set(train_start_date, train_end_date, test_start_date, test_end_d
         start_days = "2016-02-01"
         user = get_basic_user_feat()
         product = get_basic_product_feat()
-        user_acc = get_accumulate_user_feat(start_days, train_start_date)
-        product_acc = get_accumulate_product_feat(start_days, train_start_date)
+        user_acc = get_accumulate_user_feat(start_days, train_end_date)
+        product_acc = get_accumulate_product_feat(start_days, train_end_date)
         comment_acc = get_comments_product_feat(train_start_date, train_end_date)
         labels = get_labels(test_start_date, test_end_date)
 
