@@ -320,9 +320,8 @@ if __name__ == '__main__':
     test_start_date = '2016-03-01'
     test_end_date = '2016-03-05'
     user, action, label = make_train_set(train_start_date, train_end_date, test_start_date, test_end_date)
-    action.head()
-    for t in action.columns:
-        print t
+    print user.head(10)
+    print action.head(10)
 
 
 
