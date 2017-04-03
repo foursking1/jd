@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 import time
 from datetime import datetime
+from datetime import timedelta
 import pandas as pd
 import pickle
 import os
@@ -219,7 +220,7 @@ def get_labels(start_date, end_date):
     return actions
 
 
-def make_train_set(train_start_date, train_end_date, test_start_date, test_end_date):
+def make_train_set(train_start_date, train_end_date, test_start_date, test_end_date, days=30):
     dump_path = './cache/train_set_%s_%s_%s_%s.pkl' % (train_start_date, train_end_date, test_start_date, test_end_date)
     if os.path.exists(dump_path):
         actions = pickle.load(open(dump_path))
@@ -233,10 +234,16 @@ def make_train_set(train_start_date, train_end_date, test_start_date, test_end_d
         labels = get_labels(test_start_date, test_end_date)
 
         # generate 时间窗口
-        actions = get_accumulate_action_feat(train_start_date, train_end_date)
-
-
-
+        # actions = get_accumulate_action_feat(train_start_date, train_end_date)
+        actions = None
+        #for i in (1, 2, 3, 5, 7, 10, 15, 21, 30):
+        for i in (1, 2):
+            start_days = datetime.strptime(train_end_date, '%Y-%m-%d') - timedelta(days=i)
+            if actions is None:
+                actions = get_action_feat(start_days, train_end_date)
+            else:
+                actions = pd.merge(actions, get_action_feat(start_days, train_end_date), how='left',
+                                   on=['user_id', 'sku_id'])
 
         actions = pd.merge(actions, user, how='left', on='user_id')
         actions = pd.merge(actions, user_acc, how='left', on='user_id')
@@ -253,7 +260,7 @@ def report(pred, label):
     actions = label
     result = pred
 
-        # 所有用户商品对
+    # 所有用户商品对
     all_user_item_pair = actions['user_id'].map(str) + '-' + actions['sku_id'].map(str)
     all_user_item_pair = np.array(all_user_item_pair)
     # 所有购买用户
@@ -264,8 +271,7 @@ def report(pred, label):
     all_user_test_item_pair = result['user_id'].map(str) + '-' + result['sku_id'].map(str)
     all_user_test_item_pair = np.array(all_user_test_item_pair)
 
-
-    #计算所有用户购买评价指标
+    # 计算所有用户购买评价指标
     pos, neg = 0,0
     for user_id in all_user_test_set:
         if user_id in all_user_set:
