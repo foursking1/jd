@@ -242,8 +242,8 @@ def make_train_set(train_start_date, train_end_date, test_start_date, test_end_d
         # generate 时间窗口
         # actions = get_accumulate_action_feat(train_start_date, train_end_date)
         actions = None
-        #for i in (1, 2, 3, 5, 7, 10, 15, 21, 30):
-        for i in (1, 2):
+        for i in (1, 2, 3, 5, 7, 10, 15, 21, 30):
+        #for i in (1, 2):
             start_days = datetime.strptime(train_end_date, '%Y-%m-%d') - timedelta(days=i)
             start_days = start_days.strftime('%Y-%m-%d')
             if actions is None:
@@ -260,13 +260,13 @@ def make_train_set(train_start_date, train_end_date, test_start_date, test_end_d
         actions = pd.merge(actions, labels, how='left', on=['user_id', 'sku_id'])
         actions = actions.fillna(0)
 
-    user = actions[['user_id', 'sku_id']].copy()
-    label = actions['label'].copy()
+    users = actions[['user_id', 'sku_id']].copy()
+    labels = actions['label'].copy()
     del actions['user_id']
     del actions['sku_id']
     del actions['label']
 
-    return user, actions, label
+    return users, actions, labels
 
 
 def report(pred, label):
