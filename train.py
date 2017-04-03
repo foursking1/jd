@@ -7,7 +7,9 @@ def logistic_regression():
     train_end_date = '2016-03-01'
     test_start_date = '2016-03-01'
     test_end_date = '2016-03-05'
-    training_data, label = make_train_set(train_start_date, train_end_date, test_start_date, test_end_date)
+    user_index, training_data, label = make_train_set(train_start_date, train_end_date, test_start_date, test_end_date)
+
+
 
 if __name__ == '__main__':
     logistic_regression()

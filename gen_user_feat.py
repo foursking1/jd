@@ -161,6 +161,7 @@ def get_comments_product_feat(start_date, end_date):
         for date in reversed(comment_date):
             if date < comment_date_end:
                 comment_date_begin = date
+                break
         comments = comments[(comments.dt >= comment_date_begin) & (comments.dt < comment_date_end)]
         df = pd.get_dummies(comments['comment_num'], prefix='comment_num')
         comments = pd.concat([comments, df], axis=1) # type: pd.DataFrame
