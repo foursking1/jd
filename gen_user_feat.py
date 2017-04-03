@@ -23,19 +23,19 @@ comment_date = ["2016-02-01", "2016-02-08", "2016-02-15", "2016-02-22", "2016-02
 
 
 def convert_age(age_str):
-    if age_str == u'age_-1':
+    if age_str == u'-1':
         return 0
-    elif age_str == u'age_15岁以下':
+    elif age_str == u'15岁以下':
         return 1
-    elif age_str == u'age_16-25岁':
+    elif age_str == u'16-25岁':
         return 2
-    elif age_str == u'age_26-35岁':
+    elif age_str == u'26-35岁':
         return 3
-    elif age_str == u'age_36-45岁':
+    elif age_str == u'36-45岁':
         return 4
-    elif age_str == u'age_46-55岁':
+    elif age_str == u'46-55岁':
         return 5
-    elif age_str == u'age_56岁以上':
+    elif age_str == u'56岁以上':
         return 6
     else:
         return -1
