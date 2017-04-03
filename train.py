@@ -16,7 +16,13 @@ def xgboost_cv():
     train_start_date = '2016-02-01'
     train_end_date = '2016-03-01'
     test_start_date = '2016-03-01'
-    test_end_date = '2016-03-05'
+    test_end_date = '2016-03-06'
+
+    sub_start_date = '2016-02-05'
+    sub_end_date = '2016-03-05'
+    sub_test_start_date = '2016-03-05'
+    sub_test_end_date = '2016-03-10'
+
     user_index, training_data, label = make_train_set(train_start_date, train_end_date, test_start_date, test_end_date)
     X_train, X_test, y_train, y_test = train_test_split(training_data, label, test_size=0.2, random_state=0)
     dtrain=xgb.DMatrix(X_train, label=y_train)
@@ -30,11 +36,13 @@ def xgboost_cv():
     evallist = [(dtest, 'eval'), (dtrain, 'train')]
     bst=xgb.train( plst, dtrain, num_round, evallist)
 
-    test = xgb.DMatrix(training_data)
+    sub_user_index, sub_trainning_date, sub_label = make_train_set(sub_start_date, sub_end_date,
+                                                                   sub_test_start_date, sub_test_end_date)
+    test = xgb.DMatrix(sub_trainning_date)
     y = xgb.predict(test)
 
-    pred = user_index.copy()
-    y_true = user_index.copy
+    pred = sub_user_index.copy()
+    y_true = sub_user_index.copy()
     pred['label'] = y
     y_true['label'] = label
     report(pred, y_true)
