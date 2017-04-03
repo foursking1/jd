@@ -113,7 +113,7 @@ def get_action_feat(start_date, end_date):
     else:
         actions = get_actions(start_date, end_date)
         actions = actions[['user_id', 'sku_id', 'type']]
-        df = pd.get_dummies(actions['type'], prefix='%s-%s-action' % (start_date, start_date))
+        df = pd.get_dummies(actions['type'], prefix='%s-%s-action' % (start_date, end_date))
         actions = pd.concat([actions, df], axis=1)  # type: pd.DataFrame
         actions = actions.groupby(['user_id', 'sku_id'], as_index=False).count()
         del actions['type']
@@ -171,6 +171,8 @@ def get_comments_product_feat(start_date, end_date):
 
 
 def get_accumulate_user_feat(start_date, end_date):
+    feature = ['user_id', 'user_action_1_ratio', 'user_action_2_ratio', 'user_action_3_ratio',
+               'user_action_5_ratio', 'user_action_6_ratio']
     dump_path = './cache/user_feat_accumulate_%s_%s.pkl' % (start_date, end_date)
     if os.path.exists(dump_path):
         actions = pickle.load(open(dump_path))
@@ -179,17 +181,19 @@ def get_accumulate_user_feat(start_date, end_date):
         df = pd.get_dummies(actions['type'], prefix='action')
         actions = pd.concat([actions['user_id'], df], axis=1)
         actions = actions.groupby(['user_id'], as_index=False).sum()
-        actions['action_1_ratio'] = actions['action_4'] / actions['action_1']
-        actions['action_2_ratio'] = actions['action_4'] / actions['action_2']
-        actions['action_3_ratio'] = actions['action_4'] / actions['action_3']
-        actions['action_5_ratio'] = actions['action_4'] / actions['action_5']
-        actions['action_6_ratio'] = actions['action_4'] / actions['action_6']
-
+        actions['user_action_1_ratio'] = actions['action_4'] / actions['action_1']
+        actions['user_action_2_ratio'] = actions['action_4'] / actions['action_2']
+        actions['user_action_3_ratio'] = actions['action_4'] / actions['action_3']
+        actions['user_action_5_ratio'] = actions['action_4'] / actions['action_5']
+        actions['user_action_6_ratio'] = actions['action_4'] / actions['action_6']
+        actions = actions[feature]
         pickle.dump(actions, open(dump_path, 'w'))
     return actions
 
 
 def get_accumulate_product_feat(start_date, end_date):
+    feature = ['sku_id', 'product_action_1_ratio', 'product_action_2_ratio', 'product_action_3_ratio',
+               'product_action_5_ratio', 'product_action_6_ratio']
     dump_path = './cache/product_feat_accumulate_%s_%s.pkl' % (start_date, end_date)
     if os.path.exists(dump_path):
         actions = pickle.load(open(dump_path))
@@ -198,11 +202,12 @@ def get_accumulate_product_feat(start_date, end_date):
         df = pd.get_dummies(actions['type'], prefix='action')
         actions = pd.concat([actions['sku_id'], df], axis=1)
         actions = actions.groupby(['sku_id'], as_index=False).sum()
-        actions['action_1_ratio'] = actions['action_4'] / actions['action_1']
-        actions['action_2_ratio'] = actions['action_4'] / actions['action_2']
-        actions['action_3_ratio'] = actions['action_4'] / actions['action_3']
-        actions['action_5_ratio'] = actions['action_4'] / actions['action_5']
-        actions['action_6_ratio'] = actions['action_4'] / actions['action_6']
+        actions['product_action_1_ratio'] = actions['action_4'] / actions['action_1']
+        actions['product_action_2_ratio'] = actions['action_4'] / actions['action_2']
+        actions['product_action_3_ratio'] = actions['action_4'] / actions['action_3']
+        actions['product_action_5_ratio'] = actions['action_4'] / actions['action_5']
+        actions['product_action_6_ratio'] = actions['action_4'] / actions['action_6']
+        actions = actions[feature]
         pickle.dump(actions, open(dump_path, 'w'))
     return actions
 
@@ -302,10 +307,10 @@ def report(pred, label):
     print 'score=' + str(score)
 
 if __name__ == '__main__':
-    train_start_date = '2016-03-01'
-    train_end_date = '2016-03-08'
-    test_start_date = '2016-03-08'
-    test_end_date = '2016-03-12'
+    train_start_date = '2016-02-01'
+    train_end_date = '2016-03-01'
+    test_start_date = '2016-03-01'
+    test_end_date = '2016-03-05'
     action = make_train_set(train_start_date, train_end_date, test_start_date, test_end_date)
     action.head()
     for t in action.columns:
