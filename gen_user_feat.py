@@ -243,7 +243,6 @@ def make_train_set(train_start_date, train_end_date, test_start_date, test_end_d
         # actions = get_accumulate_action_feat(train_start_date, train_end_date)
         actions = None
         for i in (1, 2, 3, 5, 7, 10, 15, 21, 30):
-        #for i in (1, 2):
             start_days = datetime.strptime(train_end_date, '%Y-%m-%d') - timedelta(days=i)
             start_days = start_days.strftime('%Y-%m-%d')
             if actions is None:
