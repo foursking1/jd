@@ -226,6 +226,45 @@ def get_labels(start_date, end_date):
     return actions
 
 
+def make_test_set(train_start_date, train_end_date):
+    dump_path = './cache/test_set_%s_%s.pkl' % (train_start_date, train_end_date)
+    if os.path.exists(dump_path):
+        actions = pickle.load(open(dump_path))
+    else:
+        start_days = "2016-02-01"
+        user = get_basic_user_feat()
+        product = get_basic_product_feat()
+        user_acc = get_accumulate_user_feat(start_days, train_end_date)
+        product_acc = get_accumulate_product_feat(start_days, train_end_date)
+        comment_acc = get_comments_product_feat(train_start_date, train_end_date)
+        labels = get_labels(test_start_date, test_end_date)
+
+        # generate 时间窗口
+        # actions = get_accumulate_action_feat(train_start_date, train_end_date)
+        actions = None
+        for i in (1, 2, 3, 5, 7, 10, 15, 21, 30):
+            start_days = datetime.strptime(train_end_date, '%Y-%m-%d') - timedelta(days=i)
+            start_days = start_days.strftime('%Y-%m-%d')
+            if actions is None:
+                actions = get_action_feat(start_days, train_end_date)
+            else:
+                actions = pd.merge(actions, get_action_feat(start_days, train_end_date), how='left',
+                                   on=['user_id', 'sku_id'])
+
+        actions = pd.merge(actions, user, how='left', on='user_id')
+        actions = pd.merge(actions, user_acc, how='left', on='user_id')
+        actions = pd.merge(actions, product, how='left', on='sku_id')
+        actions = pd.merge(actions, product_acc, how='left', on='sku_id')
+        actions = pd.merge(actions, comment_acc, how='left', on='sku_id')
+        #actions = pd.merge(actions, labels, how='left', on=['user_id', 'sku_id'])
+        actions = actions.fillna(0)
+        actions = actions[actions['cate'] == 8]
+
+    users = actions[['user_id', 'sku_id']].copy()
+    del actions['user_id']
+    del actions['sku_id']
+    return users, actions
+
 def make_train_set(train_start_date, train_end_date, test_start_date, test_end_date, days=30):
     dump_path = './cache/train_set_%s_%s_%s_%s.pkl' % (train_start_date, train_end_date, test_start_date, test_end_date)
     if os.path.exists(dump_path):
