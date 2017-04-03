@@ -115,7 +115,7 @@ def get_action_feat(start_date, end_date):
         actions = actions[['user_id', 'sku_id', 'type']]
         df = pd.get_dummies(actions['type'], prefix='%s-%s-action' % (start_date, end_date))
         actions = pd.concat([actions, df], axis=1)  # type: pd.DataFrame
-        actions = actions.groupby(['user_id', 'sku_id'], as_index=False).count()
+        actions = actions.groupby(['user_id', 'sku_id'], as_index=False).sum()
         del actions['type']
         pickle.dump(actions, open(dump_path, 'w'))
     return actions
