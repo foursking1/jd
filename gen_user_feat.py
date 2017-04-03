@@ -258,7 +258,14 @@ def make_train_set(train_start_date, train_end_date, test_start_date, test_end_d
         actions = pd.merge(actions, comment_acc, how='left', on='sku_id')
         actions = pd.merge(actions, labels, how='left', on=['user_id', 'sku_id'])
         actions = actions.fillna(0)
-    return actions
+        
+    user = actions[['user_id', 'sku_id']].copy()
+    label = actions['label'].copy()
+    del actions['user_id']
+    del actions['user_id']
+    del actions['user_id']
+
+    return user, actions, label
 
 
 def report(pred, label):
