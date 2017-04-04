@@ -60,9 +60,9 @@ def get_basic_product_feat():
         product = pickle.load(open(dump_path))
     else:
         product = pd.read_csv(product_path)
-        attr1_df = pd.get_dummies(product["attr1"], prefix="attr1")
-        attr2_df = pd.get_dummies(product["attr2"], prefix="attr2")
-        attr3_df = pd.get_dummies(product["attr3"], prefix="attr3")
+        attr1_df = pd.get_dummies(product["a1"], prefix="a1")
+        attr2_df = pd.get_dummies(product["a2"], prefix="a2")
+        attr3_df = pd.get_dummies(product["a3"], prefix="a3")
         product = pd.concat([product[['sku_id', 'cate', 'brand']], attr1_df, attr2_df, attr3_df], axis=1)
         pickle.dump(product, open(dump_path, 'w'))
     return product
