@@ -24,7 +24,6 @@ def xgboost_make_submission():
 
     user_index, training_data, label = make_train_set(train_start_date, train_end_date, test_start_date, test_end_date)
     X_train, X_test, y_train, y_test = train_test_split(training_data.values, label.values, test_size=0.2, random_state=0)
-    print len(X_train)
     dtrain=xgb.DMatrix(X_train, label=y_train)
     dtest=xgb.DMatrix(X_test, label=y_test)
     param = {'max_depth': 6, 'eta': 0.05, 'silent': 1, 'objective': 'binary:logistic'}
@@ -34,12 +33,10 @@ def xgboost_make_submission():
     plst = param.items()
     plst += [('eval_metric', 'logloss')]
     evallist = [(dtest, 'eval'), (dtrain, 'train')]
-    bst=xgb.train( plst, dtrain, num_round, evallist)
-
+    bst=xgb.train(plst, dtrain, num_round, evallist)
     sub_user_index, sub_trainning_data = make_test_set(sub_start_date, sub_end_date,)
     sub_trainning_data = xgb.DMatrix(sub_trainning_data.values)
     y = bst.predict(sub_trainning_data)
-    print len(y)
     sub_user_index['label'] = y
     pred = sub_user_index[sub_user_index['label'] >= 0.03]
     pred = pred[['user_id', 'sku_id']]

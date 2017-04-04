@@ -11,9 +11,8 @@ import numpy as np
 
 action_1_path = "./data/JData_Action_201602.csv"
 action_2_path = "./data/JData_Action_201603.csv"
-action_2_extra_path = "./data/JData_Action_201603_extra.csv"
 action_3_path = "./data/JData_Action_201604.csv"
-comment_path = "./data/JData_Comment(修正版).csv"
+comment_path = "./data/JData_Comment.csv"
 product_path = "./data/JData_Product.csv"
 user_path = "./data/JData_User.csv"
 
@@ -73,13 +72,9 @@ def get_actions_1():
     action = pd.read_csv(action_1_path)
     return action
 
-
 def get_actions_2():
     action2 = pd.read_csv(action_2_path)
-    action2_extra = pd.read_csv(action_2_extra_path)
-    action2 = pd.concat([action2, action2_extra])
     return action2
-
 
 def get_actions_3():
     action3 = pd.read_csv(action_3_path)
