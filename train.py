@@ -19,15 +19,16 @@ def xgboost_make_submission():
     test_start_date = '2016-04-11'
     test_end_date = '2016-04-16'
 
-    sub_start_date = '2016-04-15'
+    sub_start_date = '2016-03-15'
     sub_end_date = '2016-04-16'
 
     user_index, training_data, label = make_train_set(train_start_date, train_end_date, test_start_date, test_end_date)
-    X_train, X_test, y_train, y_test = train_test_split(training_data, label, test_size=0.2, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(training_data.values, label.values, test_size=0.2, random_state=0)
+    print len(X_train)
     dtrain=xgb.DMatrix(X_train, label=y_train)
     dtest=xgb.DMatrix(X_test, label=y_test)
-    param = {'max_depth': 10, 'eta': 0.05, 'silent': 1, 'objective': 'binary:logistic'}
-    num_round = 4000
+    param = {'max_depth': 6, 'eta': 0.05, 'silent': 1, 'objective': 'binary:logistic'}
+    num_round = 309
     param['nthread'] = 4
     #param['eval_metric'] = "auc"
     plst = param.items()
@@ -36,11 +37,14 @@ def xgboost_make_submission():
     bst=xgb.train( plst, dtrain, num_round, evallist)
 
     sub_user_index, sub_trainning_data = make_test_set(sub_start_date, sub_end_date,)
-    sub_trainning_data = xgb.DMatrix(sub_trainning_data)
+    sub_trainning_data = xgb.DMatrix(sub_trainning_data.values)
     y = bst.predict(sub_trainning_data)
+    print len(y)
     sub_user_index['label'] = y
-    pred = sub_user_index[sub_user_index['label'] >= 0.18]
-    pred.tocsv('./sub/4-3.csv')
+    pred = sub_user_index[sub_user_index['label'] >= 0.03]
+    pred = pred[['user_id', 'sku_id']]
+    pred = pred.groupby('user_id').first().reset_index()
+    pred.to_csv('./sub/4-3.csv', index=False, index_label=False)
 
 
 
@@ -62,7 +66,7 @@ def xgboost_cv():
     param = {'max_depth': 10, 'eta': 0.05, 'silent': 1, 'objective': 'binary:logistic'}
     num_round = 4000
     param['nthread'] = 4
-    #param['eval_metric'] = "auc"
+    param['eval_metric'] = "auc"
     plst = param.items()
     plst += [('eval_metric', 'logloss')]
     evallist = [(dtest, 'eval'), (dtrain, 'train')]
@@ -71,7 +75,7 @@ def xgboost_cv():
     sub_user_index, sub_trainning_date, sub_label = make_train_set(sub_start_date, sub_end_date,
                                                                    sub_test_start_date, sub_test_end_date)
     test = xgb.DMatrix(sub_trainning_date)
-    y = bst.predict(test)
+    #y = bst.predict(test)
 
     pred = sub_user_index.copy()
     y_true = sub_user_index.copy()
@@ -81,4 +85,5 @@ def xgboost_cv():
 
 
 if __name__ == '__main__':
-    xgboost_cv()
+    #xgboost_cv()
+    xgboost_make_submission()

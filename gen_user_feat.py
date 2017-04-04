@@ -165,8 +165,9 @@ def get_comments_product_feat(start_date, end_date):
         comments = comments[(comments.dt >= comment_date_begin) & (comments.dt < comment_date_end)]
         df = pd.get_dummies(comments['comment_num'], prefix='comment_num')
         comments = pd.concat([comments, df], axis=1) # type: pd.DataFrame
-        del comments['dt']
-        del comments['comment_num']
+        #del comments['dt']
+        #del comments['comment_num']
+        comments = comments[['sku_id', 'has_bad_comment', 'bad_comment_rate', 'comment_num_1', 'comment_num_2', 'comment_num_3', 'comment_num_4']]
         pickle.dump(comments, open(dump_path, 'w'))
     return comments
 
@@ -219,6 +220,7 @@ def get_labels(start_date, end_date):
         actions = pickle.load(open(dump_path))
     else:
         actions = get_actions(start_date, end_date)
+        actions = actions[actions['type'] == 4]
         actions = actions.groupby(['user_id', 'sku_id'], as_index=False).sum()
         actions['label'] = 1
         actions = actions[['user_id', 'sku_id', 'label']]
@@ -237,7 +239,7 @@ def make_test_set(train_start_date, train_end_date):
         user_acc = get_accumulate_user_feat(start_days, train_end_date)
         product_acc = get_accumulate_product_feat(start_days, train_end_date)
         comment_acc = get_comments_product_feat(train_start_date, train_end_date)
-        labels = get_labels(test_start_date, test_end_date)
+        #labels = get_labels(test_start_date, test_end_date)
 
         # generate 时间窗口
         # actions = get_accumulate_action_feat(train_start_date, train_end_date)
