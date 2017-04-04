@@ -26,8 +26,10 @@ def xgboost_make_submission():
     X_train, X_test, y_train, y_test = train_test_split(training_data.values, label.values, test_size=0.2, random_state=0)
     dtrain=xgb.DMatrix(X_train, label=y_train)
     dtest=xgb.DMatrix(X_test, label=y_test)
-    param = {'max_depth': 6, 'eta': 0.05, 'silent': 1, 'objective': 'binary:logistic'}
-    num_round = 309
+    param = {'learning_rate' : 0.1, 'n_estimators': 1000, 'max_depth': 3, 
+	'min_child_weight': 5, 'gamma': 0, 'subsample': 1.0, 'colsample_bytree': 0.8, 
+	'scale_pos_weight': 1, 'eta': 0.05, 'silent': 1, 'objective': 'binary:logistic'}
+    num_round = 283 
     param['nthread'] = 4
     #param['eval_metric'] = "auc"
     plst = param.items()
@@ -41,6 +43,7 @@ def xgboost_make_submission():
     pred = sub_user_index[sub_user_index['label'] >= 0.03]
     pred = pred[['user_id', 'sku_id']]
     pred = pred.groupby('user_id').first().reset_index()
+    pred['user_id'] = pred['user_id'].astype(int)
     pred.to_csv('./sub/4-3.csv', index=False, index_label=False)
 
 
