@@ -1,16 +1,9 @@
 __author__ = 'foursking'
-from gen_user_feat import make_train_set
-from gen_user_feat import make_test_set
+from gen_feat import make_train_set
+from gen_feat import make_test_set
 from sklearn.model_selection import train_test_split
 import xgboost as xgb
-from gen_user_feat import report
-
-def logistic_regression():
-    train_start_date = '2016-02-01'
-    train_end_date = '2016-03-01'
-    test_start_date = '2016-03-01'
-    test_end_date = '2016-03-05'
-    user_index, training_data, label = make_train_set(train_start_date, train_end_date, test_start_date, test_end_date)
+from gen_feat import report
 
 
 def xgboost_make_submission():
@@ -27,9 +20,9 @@ def xgboost_make_submission():
     dtrain=xgb.DMatrix(X_train, label=y_train)
     dtest=xgb.DMatrix(X_test, label=y_test)
     param = {'learning_rate' : 0.1, 'n_estimators': 1000, 'max_depth': 3, 
-	'min_child_weight': 5, 'gamma': 0, 'subsample': 1.0, 'colsample_bytree': 0.8, 
-	'scale_pos_weight': 1, 'eta': 0.05, 'silent': 1, 'objective': 'binary:logistic'}
-    num_round = 283 
+        'min_child_weight': 5, 'gamma': 0, 'subsample': 1.0, 'colsample_bytree': 0.8,
+        'scale_pos_weight': 1, 'eta': 0.05, 'silent': 1, 'objective': 'binary:logistic'}
+    num_round = 283
     param['nthread'] = 4
     #param['eval_metric'] = "auc"
     plst = param.items()
@@ -44,7 +37,7 @@ def xgboost_make_submission():
     pred = pred[['user_id', 'sku_id']]
     pred = pred.groupby('user_id').first().reset_index()
     pred['user_id'] = pred['user_id'].astype(int)
-    pred.to_csv('./sub/4-3.csv', index=False, index_label=False)
+    pred.to_csv('./sub/submission.csv', index=False, index_label=False)
 
 
 
